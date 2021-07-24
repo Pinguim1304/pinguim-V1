@@ -1,15 +1,17 @@
-const help = (pushname, tampilJam, tampilHari, tampilUcapan, prefix) => {
+const help = (pushname, tampilJam, tampilHari, tampilUcapan, sender, patt, getLevelingLevel, getLevelingXp, prefix) => {
 	return `
-╭───「 *BEM - VINDO* 」─────
-├⊱ ─────────────────
-├⊱「 ${pushname} 」
-├⊱ ─────────────────
+╭───「 *INFO USUÁRIO* 」
+├⊱ *Olá ${pushname}*
+├⊱ *Número: ${sender.split('@')[0]}*
+├⊱ *Level: ${getLevelingLevel(sender)}*
+├⊱ *Xp: ${getLevelingXp(sender)}*
+├⊱ *Patente: ${patt}*
 ╰────────────────────
 ╭───「 *SOBRE O BOT* 」
 ├⊱ Nome: *PINGUIM BOT*
 ├⊱ Dono: *Pinguim e Lari*
 ├⊱ *Wa.me/5511959118827*
-├⊱ Status: Online ✅
+├⊱ *Status: Online* ✅
 ├⊱ *Bot em testes...*
 ├⊱ *Não kiba xerequinha* 🐊🚩
 ├⊱ *Prefix* 「 ${prefix} 」
@@ -19,11 +21,6 @@ const help = (pushname, tampilJam, tampilHari, tampilUcapan, prefix) => {
 ├⊱┗❰ *${tampilJam}*
 ├⊱┏❰ *Dia*
 ├⊱┗❰ *${tampilHari}*
-╰────────────────────
-╭────「 ⚡ *Novo* ⚡」
-├⊱ *Quer add o bot no seu grupo?*
-├⊱ *Fale com a Lari* 😎
-├⊱ *Zap: Wa.me/553892564417*
 ╰────────────────────
 ╭───「⭐ *MENUS* ⭐」
 ├⊱    💌 *${prefix}menufig* 💌
@@ -35,7 +32,7 @@ const help = (pushname, tampilJam, tampilHari, tampilUcapan, prefix) => {
 ├⊱    📸 *${prefix}imagens* 📸
 ├⊱「Utilidade-menu de img」
 ├⊱    👾 *${prefix}jogos* 👾
-├⊱「Utilidade-para zoar」
+├⊱「Utilidade-para entreter」
 ├⊱    🌟 *${prefix}logos* 🌟 
 ├⊱「Utilidade-fazer logos」
 ├⊱    💎 *${prefix}menuvip* 💎
@@ -45,10 +42,12 @@ const help = (pushname, tampilJam, tampilHari, tampilUcapan, prefix) => {
 ├⊱    🛠️ *${prefix}ferramentas* 🛠️
 ├⊱「Utilidade-sendo feito」
 ├⊱   *[ ❗ ] Em breve mais...*
-├⊱
-├⊱ 👑 *PINGUIM DOMINA* 👑
+╰───────────────────
+╭──「⚡ *Pinguim - Bot* ⚡」
 ├⊱ ©  *Copyright by Pinguim*
 ├⊱ ®  *Dominando tudo* ⚡
+╰───────────────────
+╭───────────────────
 ├⊱   ▌│█║▌║▌║ - ║▌║▌║█▌
 ╰───────────────────`
 }
