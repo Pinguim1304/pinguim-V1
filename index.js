@@ -36,6 +36,7 @@ const { chentai } = require('./src/chentai')
 const { gcpf } = require('./src/gcpf')
 const { addsay } = require('./src/addsay')
 const { listsay } = require('./src/listsay')
+//const { regras } = require('./src/regras')
 const { addfoto } = require('./src/addfoto')
 const { wait, simih, getBuffer, h2k, generateMessageID, getGroupAdmins, getRandom, banner, start, info, success, close } = require('./lib/functions')
 const { fetchJson } = require('./lib/fetcher')
@@ -72,13 +73,19 @@ const tobzkey = 'apitobz';
 const BotName = 'Pinguim bot'; 
 const instagram = 'http://www.instagram.com/'; 
 const aktif = '08:00 - 22:00';
+//jogo da velha 
+const infos = JSON.parse(fs.readFileSync('./database/data/settings.json'))
+const { cdd } = infos
+const { addTTTId, addTTTwin,addTTTdefeat, addTTTtie, addTTTpoints, getTTTId, getTTTwins, getTTTdefeats, getTTTties, getTTTpoints } = require('./lib/tictactoe.js') //JOGO DA VELHA,AGRADECIMENTOS: Resen
+const tictactoe = JSON.parse(fs.readFileSync('./database/ttt/tictactoe.json'));
+//jogo da velha
 const vcard = 'BEGIN:VCARD\n'
             + 'VERSION:3.0\n' 
             + 'FN:meu criador\n' // criador
             + 'ORG: PINGUIM;\n' // nome do bot
             + 'TEL;type=CELL;type=VOICE;waid=5511959118827:+55 11 95911-8827\n' //Nomor whatsapp kamu
             + 'END:VCARD'
-prefix = '.','!','#'
+prefix = '.','/'
 blocked = []
 limitawal = '999999999'
 cr = '*PINGUIM*'
@@ -95,9 +102,480 @@ const antilink = JSON.parse(fs.readFileSync('./database/json/antilink.json'))
 const antifake = JSON.parse(fs.readFileSync('./src/antifake.json'))
 const event = JSON.parse(fs.readFileSync('./database/json/event.json'))
 const _level = JSON.parse(fs.readFileSync('./database/user/level.json'))
-const _limit = JSON.parse(fs.readFileSync('./database/json/limit.json'))
+//const _limit = JSON.parse(fs.readFileSync('./database/json/limit.json'))
 /*************** FIM ***************/
+//_TIC-TAC-TOE By: Resen
+const { addLimit, getLimit } = require('./database/lib/limit.js')// LIMITADOR, AGRADECIMENTOS: IRIS(kill), Resen
+//const { addLimit, getLimit } = require('./database/json/limit.json')// LIMITADOR, AGRADECIMENTOS: IRIS(kill), Resen
+const daily = JSON.parse(fs.readFileSync('./database/data/diario.json'))
+const { ttthelp } = require('./database/ttt/TTTconfig/ttthelp');
+const { tttme } = require('./database/ttt/TTTconfig/tttme');
+var tttset = require('./database/ttt/TTTconfig/tttset.json');
+var esp = require('./database/ttt/TTTconfig/tttframe.json');
 
+//_TESTE PARA VITÓRIA DE ❌
+const WinnerX = () => {
+	if (
+		(esp.a1=="❌"&&esp.a2=="❌"&&esp.a3=="❌") || (esp.b1=="❌"&&esp.b2=="❌"&&esp.b3=="❌") || (esp.c1=="❌"&&esp.c2=="❌"&&esp.c3=="❌") || 
+		(esp.a1=="❌"&&esp.b1=="❌"&&esp.c1=="❌") || (esp.a2=="❌"&&esp.b2=="❌"&&esp.c2=="❌") || (esp.a3=="❌"&&esp.b3=="❌"&&esp.c3=="❌") ||
+		(esp.a1=="❌"&&esp.b2=="❌"&&esp.c3=="❌") || (esp.a3=="❌"&&esp.b2=="❌"&&esp.c1=="❌")
+	) {
+		return true
+	} else {
+		return false
+	}
+}
+
+//TESTE PARA VITÓRIA DE ⭕
+const WinnerO = () => {
+	if (
+		(esp.a1=="⭕"&&esp.a2=="⭕"&&esp.a3=="⭕") || (esp.b1=="⭕"&&esp.b2=="⭕"&&esp.b3=="⭕") || (esp.c1=="⭕"&&esp.c2=="⭕"&&esp.c3=="⭕") || 
+		(esp.a1=="⭕"&&esp.b1=="⭕"&&esp.c1=="⭕") || (esp.a2=="⭕"&&esp.b2=="⭕"&&esp.c2=="⭕") || (esp.a3=="⭕"&&esp.b3=="⭕"&&esp.c3=="⭕") ||
+		(esp.a1=="⭕"&&esp.b2=="⭕"&&esp.c3=="⭕") || (esp.a3=="⭕"&&esp.b2=="⭕"&&esp.c1=="⭕")
+	) {
+		return true
+	} else {
+		return false
+	}
+}
+
+//TESTE PARA EMPATE
+const Tie = () => {
+	if (esp.a1!="🔲"&&esp.a2!="🔲"&&esp.a3!="🔲"&&esp.b1!="🔲"&&esp.b2!="🔲"&&esp.b3!="🔲"&&esp.c1!="🔲"&&esp.c2!="🔲"&&esp.c3!="🔲") {
+		return true
+	} else {
+		return false
+	}
+}
+
+const IA = () => {
+    if (WinnerX() || WinnerO() || Tie()) {
+		tttset.reActivate1 = "off"
+//INICIO DO MODO IMPOSSIVEL
+	} else if (tttset.tttdifficulty == "IMPOSSIBLE" && ( 
+		//TESTE PARA TENTATIVA DE VITÓRIA
+		(esp.a1=="⭕"&&esp.a2=="⭕"&&esp.a3=="🔲") || (esp.a1=="⭕"&&esp.a2=="🔲"&&esp.a3=="⭕") || (esp.a1=="🔲"&&esp.a2=="⭕"&&esp.a3=="⭕") ||
+		(esp.b1=="⭕"&&esp.b2=="⭕"&&esp.b3=="🔲") || (esp.b1=="⭕"&&esp.b2=="🔲"&&esp.b3=="⭕") || (esp.b1=="🔲"&&esp.b2=="⭕"&&esp.b3=="⭕") ||
+		(esp.c1=="⭕"&&esp.c2=="⭕"&&esp.c3=="🔲") || (esp.c1=="⭕"&&esp.c2=="🔲"&&esp.c3=="⭕") || (esp.c1=="🔲"&&esp.c2=="⭕"&&esp.c3=="⭕") ||
+		(esp.a1=="⭕"&&esp.b1=="⭕"&&esp.c1=="🔲") || (esp.a1=="⭕"&&esp.b1=="🔲"&&esp.c1=="⭕") || (esp.a1=="🔲"&&esp.b1=="⭕"&&esp.c1=="⭕") ||
+		(esp.a2=="⭕"&&esp.b2=="⭕"&&esp.c2=="🔲") || (esp.a2=="⭕"&&esp.b2=="🔲"&&esp.c2=="⭕") || (esp.a2=="🔲"&&esp.b2=="⭕"&&esp.c2=="⭕") ||
+		(esp.a3=="⭕"&&esp.b3=="⭕"&&esp.c3=="🔲") || (esp.a3=="⭕"&&esp.b3=="🔲"&&esp.c3=="⭕") || (esp.a3=="🔲"&&esp.b3=="⭕"&&esp.c3=="⭕") ||
+		(esp.a1=="⭕"&&esp.b2=="⭕"&&esp.c3=="🔲") || (esp.a1=="⭕"&&esp.b2=="🔲"&&esp.c3=="⭕") || (esp.a1=="🔲"&&esp.b2=="⭕"&&esp.c3=="⭕") ||
+		(esp.a3=="⭕"&&esp.b2=="⭕"&&esp.c1=="🔲") || (esp.a3=="⭕"&&esp.b2=="🔲"&&esp.c1=="⭕") || (esp.a3=="🔲"&&esp.b2=="⭕"&&esp.c1=="⭕") ||
+		//TESTE PARA TENTATIVA DE BLOQUEIO
+		(esp.a1=="❌"&&esp.a2=="❌"&&esp.a3=="🔲") || (esp.a1=="❌"&&esp.a2=="🔲"&&esp.a3=="❌") || (esp.a1=="🔲"&&esp.a2=="❌"&&esp.a3=="❌") ||
+		(esp.b1=="❌"&&esp.b2=="❌"&&esp.b3=="🔲") || (esp.b1=="❌"&&esp.b2=="🔲"&&esp.b3=="❌") || (esp.b1=="🔲"&&esp.b2=="❌"&&esp.b3=="❌") ||
+		(esp.c1=="❌"&&esp.c2=="❌"&&esp.c3=="🔲") || (esp.c1=="❌"&&esp.c2=="🔲"&&esp.c3=="❌") || (esp.c1=="🔲"&&esp.c2=="❌"&&esp.c3=="❌") ||
+		(esp.a1=="❌"&&esp.b1=="❌"&&esp.c1=="🔲") || (esp.a1=="❌"&&esp.b1=="🔲"&&esp.c1=="❌") || (esp.a1=="🔲"&&esp.b1=="❌"&&esp.c1=="❌") ||
+		(esp.a2=="❌"&&esp.b2=="❌"&&esp.c2=="🔲") || (esp.a2=="❌"&&esp.b2=="🔲"&&esp.c2=="❌") || (esp.a2=="🔲"&&esp.b2=="❌"&&esp.c2=="❌") ||
+		(esp.a3=="❌"&&esp.b3=="❌"&&esp.c3=="🔲") || (esp.a3=="❌"&&esp.b3=="🔲"&&esp.c3=="❌") || (esp.a3=="🔲"&&esp.b3=="❌"&&esp.c3=="❌") ||
+		(esp.a1=="❌"&&esp.b2=="❌"&&esp.c3=="🔲") || (esp.a1=="❌"&&esp.b2=="🔲"&&esp.c3=="❌") || (esp.a1=="🔲"&&esp.b2=="❌"&&esp.c3=="❌") ||
+		(esp.a3=="❌"&&esp.b2=="❌"&&esp.c1=="🔲") || (esp.a3=="❌"&&esp.b2=="🔲"&&esp.c1=="❌") || (esp.a3=="🔲"&&esp.b2=="❌"&&esp.c1=="❌")
+	)){
+		tttset.reActivate1 = "off"
+		IAmove1()
+	//JOGADAS PROGRAMADAS ABAIXO
+	} else if (tttset.tttdifficulty == "IMPOSSIBLE" &&
+              ((esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "❌" && esp.c2 == "🔲" && esp.c3 == "⭕") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "❌" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "⭕") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "❌" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "🔲" && esp.c1 == "⭕" && esp.c2 == "❌" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "⭕" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "❌" && esp.c1 == "❌" && esp.c2 == "🔲" && esp.c3 == "🔲"))) {
+     	  tttset.reActivate1 = "off"
+          esp.a1 = "⭕"
+	} else if (tttset.tttdifficulty == "IMPOSSIBLE" &&
+              ((esp.a1 == "⭕" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "❌" && esp.b2 == "⭕" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "❌") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "⭕" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "❌" && esp.c1 == "❌" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "❌" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "❌") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "❌" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "🔲" && esp.c1 == "❌" && esp.c2 == "🔲" && esp.c3 == "🔲"))) {
+          tttset.reActivate1 = "off"
+          esp.a2 = "⭕"
+	} else if (tttset.tttdifficulty == "IMPOSSIBLE" &&
+              ((esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "⭕" && esp.c2 == "🔲" && esp.c3 == "❌") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "❌" && esp.b3 == "🔲" && esp.c1 == "⭕" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "❌" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "❌" && esp.c3 == "⭕") ||
+               (esp.a1 == "⭕" && esp.a2 == "🔲" && esp.a3 == "❌" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "❌"))) {
+          tttset.reActivate1 = "off"
+          esp.a3 = "⭕"
+	} else if (tttset.tttdifficulty == "IMPOSSIBLE" &&
+              ((esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "❌" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "🔲" && esp.c1 == "⭕" && esp.c2 == "❌" && esp.c3 == "🔲") ||
+               (esp.a1 == "⭕" && esp.a2 == "❌" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "❌"))) {
+          tttset.reActivate1 = "off"
+          esp.b1 = "⭕"
+	} else if (tttset.tttdifficulty == "IMPOSSIBLE" &&
+              ((esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "⭕" && esp.c2 == "❌" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "❌" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "⭕" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "❌" && esp.c3 == "⭕") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "❌" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "⭕") ||
+               (esp.a1 == "⭕" && esp.a2 == "❌" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "⭕" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "❌" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "❌" && esp.a3 == "⭕" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "⭕" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "❌" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "❌" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "⭕" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "❌" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "⭕") ||
+               (esp.a1 == "⭕" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "❌") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "⭕" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "❌" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "❌" && esp.c1 == "⭕" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "❌" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "⭕" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "❌" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "⭕") ||
+               (esp.a1 == "🔲" && esp.a2 == "❌" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "⭕") ||
+               (esp.a1 == "⭕" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "❌" && esp.c3 == "🔲") ||
+               (esp.a1 == "⭕" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "❌" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "⭕" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "❌" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "⭕" && esp.b1 == "❌" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "❌") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "❌" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "❌" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "❌" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "🔲"))) {
+          tttset.reActivate1 = "off"
+          esp.b2 = "⭕"
+	} else if (tttset.tttdifficulty == "IMPOSSIBLE" &&
+              ((esp.a1 == "❌" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "❌" && esp.c3 == "⭕") ||
+               (esp.a1 == "🔲" && esp.a2 == "❌" && esp.a3 == "⭕" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "🔲" && esp.c1 == "❌" && esp.c2 == "🔲" && esp.c3 == "🔲"))) {
+          tttset.reActivate1 = "off"
+          esp.b3 = "⭕"
+	} else if (tttset.tttdifficulty == "IMPOSSIBLE" &&
+              ((esp.a1 == "❌" && esp.a2 == "🔲" && esp.a3 == "⭕" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "⭕" && esp.b1 == "🔲" && esp.b2 == "❌" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "❌" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "❌" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "⭕") ||
+               (esp.a1 == "⭕" && esp.a2 == "❌" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "❌"))) {
+          tttset.reActivate1 = "off"
+          esp.c1 = "⭕"
+	} else if (tttset.tttdifficulty == "IMPOSSIBLE" &&
+              ((esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "❌" && esp.b1 == "❌" && esp.b2 == "⭕" && esp.b3 == "🔲" && esp.c1 == "⭕" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "❌" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "❌" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "⭕"))) {
+          tttset.reActivate1 = "off"
+          esp.c2 = "⭕"
+	} else if (tttset.tttdifficulty == "IMPOSSIBLE" &&
+		    ((esp.a1 == "⭕" && esp.a2 == "🔲" && esp.a3 == "❌" && esp.b1 == "🔲" && esp.b2 == "🔲" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "⭕" && esp.a2 == "🔲" && esp.a3 == "🔲" && esp.b1 == "🔲" && esp.b2 == "❌" && esp.b3 == "🔲" && esp.c1 == "🔲" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "🔲" && esp.a3 == "❌" && esp.b1 == "❌" && esp.b2 == "⭕" && esp.b3 == "🔲" && esp.c1 == "⭕" && esp.c2 == "🔲" && esp.c3 == "🔲") ||
+               (esp.a1 == "🔲" && esp.a2 == "❌" && esp.a3 == "⭕" && esp.b1 == "🔲" && esp.b2 == "⭕" && esp.b3 == "🔲" && esp.c1 == "❌" && esp.c2 == "🔲" && esp.c3 == "🔲"))) {
+          tttset.reActivate1 = "off"
+          esp.c3 = "⭕"
+	} else if (tttset.tttdifficulty == "IMPOSSIBLE" && (esp.a1 ==  "🔲" || esp.a3 ==  "🔲" || esp.b2 ==  "🔲" || esp.c1 ==  "🔲" || esp.c3 ==  "🔲")) {
+		//PRIORIZAR CANTOS E CENTRO
+		tttset.reActivate1 = "off"
+		while (tttset.reActivate3 == "on") {
+			priorityC()
+		}
+		tttset.reActivate3 = "on"
+//FIM DO MODO IMPOSSIVEL
+	} else if (tttset.tttdifficulty == "HARD" && ( 
+		//TESTE PARA TENTATIVA DE VITÓRIA
+		(esp.a1=="⭕"&&esp.a2=="⭕"&&esp.a3=="🔲") || (esp.a1=="⭕"&&esp.a2=="🔲"&&esp.a3=="⭕") || (esp.a1=="🔲"&&esp.a2=="⭕"&&esp.a3=="⭕") ||
+		(esp.b1=="⭕"&&esp.b2=="⭕"&&esp.b3=="🔲") || (esp.b1=="⭕"&&esp.b2=="🔲"&&esp.b3=="⭕") || (esp.b1=="🔲"&&esp.b2=="⭕"&&esp.b3=="⭕") ||
+		(esp.c1=="⭕"&&esp.c2=="⭕"&&esp.c3=="🔲") || (esp.c1=="⭕"&&esp.c2=="🔲"&&esp.c3=="⭕") || (esp.c1=="🔲"&&esp.c2=="⭕"&&esp.c3=="⭕") ||
+		(esp.a1=="⭕"&&esp.b1=="⭕"&&esp.c1=="🔲") || (esp.a1=="⭕"&&esp.b1=="🔲"&&esp.c1=="⭕") || (esp.a1=="🔲"&&esp.b1=="⭕"&&esp.c1=="⭕") ||
+		(esp.a2=="⭕"&&esp.b2=="⭕"&&esp.c2=="🔲") || (esp.a2=="⭕"&&esp.b2=="🔲"&&esp.c2=="⭕") || (esp.a2=="🔲"&&esp.b2=="⭕"&&esp.c2=="⭕") ||
+		(esp.a3=="⭕"&&esp.b3=="⭕"&&esp.c3=="🔲") || (esp.a3=="⭕"&&esp.b3=="🔲"&&esp.c3=="⭕") || (esp.a3=="🔲"&&esp.b3=="⭕"&&esp.c3=="⭕") ||
+		(esp.a1=="⭕"&&esp.b2=="⭕"&&esp.c3=="🔲") || (esp.a1=="⭕"&&esp.b2=="🔲"&&esp.c3=="⭕") || (esp.a1=="🔲"&&esp.b2=="⭕"&&esp.c3=="⭕") ||
+		(esp.a3=="⭕"&&esp.b2=="⭕"&&esp.c1=="🔲") || (esp.a3=="⭕"&&esp.b2=="🔲"&&esp.c1=="⭕") || (esp.a3=="🔲"&&esp.b2=="⭕"&&esp.c1=="⭕") ||
+		//TESTE PARA TENTATIVA DE BLOQUEIO
+		(esp.a1=="❌"&&esp.a2=="❌"&&esp.a3=="🔲") || (esp.a1=="❌"&&esp.a2=="🔲"&&esp.a3=="❌") || (esp.a1=="🔲"&&esp.a2=="❌"&&esp.a3=="❌") ||
+		(esp.b1=="❌"&&esp.b2=="❌"&&esp.b3=="🔲") || (esp.b1=="❌"&&esp.b2=="🔲"&&esp.b3=="❌") || (esp.b1=="🔲"&&esp.b2=="❌"&&esp.b3=="❌") ||
+		(esp.c1=="❌"&&esp.c2=="❌"&&esp.c3=="🔲") || (esp.c1=="❌"&&esp.c2=="🔲"&&esp.c3=="❌") || (esp.c1=="🔲"&&esp.c2=="❌"&&esp.c3=="❌") ||
+		(esp.a1=="❌"&&esp.b1=="❌"&&esp.c1=="🔲") || (esp.a1=="❌"&&esp.b1=="🔲"&&esp.c1=="❌") || (esp.a1=="🔲"&&esp.b1=="❌"&&esp.c1=="❌") ||
+		(esp.a2=="❌"&&esp.b2=="❌"&&esp.c2=="🔲") || (esp.a2=="❌"&&esp.b2=="🔲"&&esp.c2=="❌") || (esp.a2=="🔲"&&esp.b2=="❌"&&esp.c2=="❌") ||
+		(esp.a3=="❌"&&esp.b3=="❌"&&esp.c3=="🔲") || (esp.a3=="❌"&&esp.b3=="🔲"&&esp.c3=="❌") || (esp.a3=="🔲"&&esp.b3=="❌"&&esp.c3=="❌") ||
+		(esp.a1=="❌"&&esp.b2=="❌"&&esp.c3=="🔲") || (esp.a1=="❌"&&esp.b2=="🔲"&&esp.c3=="❌") || (esp.a1=="🔲"&&esp.b2=="❌"&&esp.c3=="❌") ||
+		(esp.a3=="❌"&&esp.b2=="❌"&&esp.c1=="🔲") || (esp.a3=="❌"&&esp.b2=="🔲"&&esp.c1=="❌") || (esp.a3=="🔲"&&esp.b2=="❌"&&esp.c1=="❌")
+	)){
+		//HARD
+		tttset.reActivate1 = "off"
+		IAmove1()
+	} else if (tttset.tttdifficulty == "NORMAL" && ( 
+		//TESTE PARA TENTATIVA DE VITÓRIA
+		(esp.a1=="⭕"&&esp.a2=="⭕"&&esp.a3=="🔲") || (esp.a1=="⭕"&&esp.a2=="🔲"&&esp.a3=="⭕") || (esp.a1=="🔲"&&esp.a2=="⭕"&&esp.a3=="⭕") ||
+		(esp.b1=="⭕"&&esp.b2=="⭕"&&esp.b3=="🔲") || (esp.b1=="⭕"&&esp.b2=="🔲"&&esp.b3=="⭕") || (esp.b1=="🔲"&&esp.b2=="⭕"&&esp.b3=="⭕") ||
+		(esp.c1=="⭕"&&esp.c2=="⭕"&&esp.c3=="🔲") || (esp.c1=="⭕"&&esp.c2=="🔲"&&esp.c3=="⭕") || (esp.c1=="🔲"&&esp.c2=="⭕"&&esp.c3=="⭕") ||
+		(esp.a1=="⭕"&&esp.b1=="⭕"&&esp.c1=="🔲") || (esp.a1=="⭕"&&esp.b1=="🔲"&&esp.c1=="⭕") || (esp.a1=="🔲"&&esp.b1=="⭕"&&esp.c1=="⭕") ||
+		(esp.a2=="⭕"&&esp.b2=="⭕"&&esp.c2=="🔲") || (esp.a2=="⭕"&&esp.b2=="🔲"&&esp.c2=="⭕") || (esp.a2=="🔲"&&esp.b2=="⭕"&&esp.c2=="⭕") ||
+		(esp.a3=="⭕"&&esp.b3=="⭕"&&esp.c3=="🔲") || (esp.a3=="⭕"&&esp.b3=="🔲"&&esp.c3=="⭕") || (esp.a3=="🔲"&&esp.b3=="⭕"&&esp.c3=="⭕") ||
+		(esp.a1=="⭕"&&esp.b2=="⭕"&&esp.c3=="🔲") || (esp.a1=="⭕"&&esp.b2=="🔲"&&esp.c3=="⭕") || (esp.a1=="🔲"&&esp.b2=="⭕"&&esp.c3=="⭕") ||
+		(esp.a3=="⭕"&&esp.b2=="⭕"&&esp.c1=="🔲") || (esp.a3=="⭕"&&esp.b2=="🔲"&&esp.c1=="⭕") || (esp.a3=="🔲"&&esp.b2=="⭕"&&esp.c1=="⭕") ||
+		//TESTE PARA TENTATIVA DE BLOQUEIO
+		(esp.a1=="❌"&&esp.a2=="❌"&&esp.a3=="🔲") || (esp.a1=="❌"&&esp.a2=="🔲"&&esp.a3=="❌") || (esp.a1=="🔲"&&esp.a2=="❌"&&esp.a3=="❌") ||
+		(esp.b1=="❌"&&esp.b2=="❌"&&esp.b3=="🔲") || (esp.b1=="❌"&&esp.b2=="🔲"&&esp.b3=="❌") || (esp.b1=="🔲"&&esp.b2=="❌"&&esp.b3=="❌") ||
+		(esp.c1=="❌"&&esp.c2=="❌"&&esp.c3=="🔲") || (esp.c1=="❌"&&esp.c2=="🔲"&&esp.c3=="❌") || (esp.c1=="🔲"&&esp.c2=="❌"&&esp.c3=="❌") ||
+		(esp.a1=="❌"&&esp.b1=="❌"&&esp.c1=="🔲") || (esp.a1=="❌"&&esp.b1=="🔲"&&esp.c1=="❌") || (esp.a1=="🔲"&&esp.b1=="❌"&&esp.c1=="❌") ||
+		(esp.a2=="❌"&&esp.b2=="❌"&&esp.c2=="🔲") || (esp.a2=="❌"&&esp.b2=="🔲"&&esp.c2=="❌") || (esp.a2=="🔲"&&esp.b2=="❌"&&esp.c2=="❌") ||
+		(esp.a3=="❌"&&esp.b3=="❌"&&esp.c3=="🔲") || (esp.a3=="❌"&&esp.b3=="🔲"&&esp.c3=="❌") || (esp.a3=="🔲"&&esp.b3=="❌"&&esp.c3=="❌") ||
+		(esp.a1=="❌"&&esp.b2=="❌"&&esp.c3=="🔲") || (esp.a1=="❌"&&esp.b2=="🔲"&&esp.c3=="❌") || (esp.a1=="🔲"&&esp.b2=="❌"&&esp.c3=="❌") ||
+		(esp.a3=="❌"&&esp.b2=="❌"&&esp.c1=="🔲") || (esp.a3=="❌"&&esp.b2=="🔲"&&esp.c1=="❌") || (esp.a3=="🔲"&&esp.b2=="❌"&&esp.c1=="❌")
+	)){
+		//NORMAL
+		tttset.reActivate1 = "off"
+		let randomNORMAL = Math.floor(Math.random() * 3)
+		if (randomNORMAL == 0 || randomNORMAL == 1) {
+			IAmove1()
+		} else {
+			while (tttset.reActivate2 == "on") {
+				IAalter()
+			}
+		}
+		tttset.reActivate2 = "on"
+	} else {
+		//EASY / RANDOM
+		let randomALL = Math.floor(Math.random() * 9)
+		switch (randomALL) {
+			case 0:
+				if (esp.a1 == "🔲") {
+    	            tttset.reActivate1 = "off"
+    	            esp.a1 = "⭕"
+    	        }
+    	    break
+			case 1:
+				if (esp.a2 == "🔲") {
+    	            tttset.reActivate1 = "off"
+    	            esp.a2 = "⭕"
+    	        }
+    	    break
+			case 2:
+				if (esp.a3 == "🔲") {
+    	            tttset.reActivate1 = "off"
+    	            esp.a3 = "⭕"
+    	        }
+    	    break
+			case 3:
+				if (esp.b1 == "🔲") {
+    	            tttset.reActivate1 = "off"
+    	            esp.b1 = "⭕"
+    	        }
+    	    break
+			case 4:
+				if (esp.b2 == "🔲") {
+    	            tttset.reActivate1 = "off"
+    	            esp.b2 = "⭕"
+    	        }
+    	    break
+			case 5:
+				if (esp.b3 == "🔲") {
+    	            tttset.reActivate1 = "off"
+    	            esp.b3 = "⭕"
+    	        }
+    	    break
+			case 6:
+				if (esp.c1 == "🔲") {
+    	            tttset.reActivate1 = "off"
+    	            esp.c1 = "⭕"
+    	        }
+    	    break
+			case 7:
+				if (esp.c2 == "🔲") {
+    	            tttset.reActivate1 = "off"
+    	            esp.c2 = "⭕"
+    	        }
+    	    break
+			case 8:
+				if (esp.c3 == "🔲") {
+        	        tttset.reActivate1 = "off"
+        	        esp.c3 = "⭕"
+        	    }
+        	break
+		}
+	}
+}
+
+const IAmove1 = () => {
+	//JOGADA PARA VITÓRIA
+	if (esp.a1=="⭕"&&esp.a2=="⭕"&&esp.a3=="🔲") {
+		esp.a3 = "⭕"
+	} else if (esp.a1=="⭕"&&esp.a2=="🔲"&&esp.a3=="⭕") {
+		esp.a2 = "⭕"
+	} else if (esp.a1=="🔲"&&esp.a2=="⭕"&&esp.a3=="⭕") {
+		esp.a1 = "⭕"
+	} else if (esp.b1=="⭕"&&esp.b2=="⭕"&&esp.b3=="🔲") {
+		esp.b3 = "⭕"
+	} else if (esp.b1=="⭕"&&esp.b2=="🔲"&&esp.b3=="⭕") {
+		esp.b2 = "⭕"
+	} else if (esp.b1=="🔲"&&esp.b2=="⭕"&&esp.b3=="⭕") {
+		esp.b1 = "⭕"
+	} else if (esp.c1=="⭕"&&esp.c2=="⭕"&&esp.c3=="🔲") {
+		esp.c3 = "⭕"
+	} else if (esp.c1=="⭕"&&esp.c2=="🔲"&&esp.c3=="⭕") {
+		esp.c2 = "⭕"
+	} else if (esp.c1=="🔲"&&esp.c2=="⭕"&&esp.c3=="⭕") {
+		esp.c1 = "⭕"
+	} else if (esp.a1=="⭕"&&esp.b1=="⭕"&&esp.c1=="🔲") {
+		esp.c1 = "⭕"
+	} else if (esp.a1=="⭕"&&esp.b1=="🔲"&&esp.c1=="⭕") {
+		esp.b1 = "⭕"
+	} else if (esp.a1=="🔲"&&esp.b1=="⭕"&&esp.c1=="⭕") {
+		esp.a1 = "⭕"
+	} else if (esp.a2=="⭕"&&esp.b2=="⭕"&&esp.c2=="🔲") {
+		esp.c2 = "⭕"
+	} else if (esp.a2=="⭕"&&esp.b2=="🔲"&&esp.c2=="⭕") {
+		esp.b2 = "⭕"
+	} else if (esp.a2=="🔲"&&esp.b2=="⭕"&&esp.c2=="⭕") {
+		esp.a2 = "⭕"
+	} else if (esp.a3=="⭕"&&esp.b3=="⭕"&&esp.c3=="🔲") {
+		esp.c3 = "⭕"
+	} else if (esp.a3=="⭕"&&esp.b3=="🔲"&&esp.c3=="⭕") {
+		esp.b3 = "⭕"
+	} else if (esp.a3=="🔲"&&esp.b3=="⭕"&&esp.c3=="⭕") {
+		esp.a3 = "⭕"
+	} else if (esp.a1=="⭕"&&esp.b2=="⭕"&&esp.c3=="🔲") {
+		esp.c3 = "⭕"
+	} else if (esp.a1=="⭕"&&esp.b2=="🔲"&&esp.c3=="⭕") {
+		esp.b2 = "⭕"
+	} else if (esp.a1=="🔲"&&esp.b2=="⭕"&&esp.c3=="⭕") {
+		esp.a1 = "⭕"
+	} else if (esp.a3=="⭕"&&esp.b2=="⭕"&&esp.c1=="🔲") {
+		esp.c1 = "⭕"
+	} else if (esp.a3=="⭕"&&esp.b2=="🔲"&&esp.c1=="⭕") {
+		esp.b2 = "⭕"
+	} else if (esp.a3=="🔲"&&esp.b2=="⭕"&&esp.c1=="⭕") {
+		esp.a3 = "⭕"
+	//JOGADA PARA BLOQUEIO
+	} else if (esp.a1=="❌"&&esp.a2=="❌"&&esp.a3=="🔲") {
+		esp.a3 = "⭕"
+	} else if (esp.a1=="❌"&&esp.a2=="🔲"&&esp.a3=="❌") {
+		esp.a2 = "⭕"
+	} else if (esp.a1=="🔲"&&esp.a2=="❌"&&esp.a3=="❌") {
+		esp.a1 = "⭕"
+	} else if (esp.b1=="❌"&&esp.b2=="❌"&&esp.b3=="🔲") {
+		esp.b3 = "⭕"
+	} else if (esp.b1=="❌"&&esp.b2=="🔲"&&esp.b3=="❌") {
+		esp.b2 = "⭕"
+	} else if (esp.b1=="🔲"&&esp.b2=="❌"&&esp.b3=="❌") {
+		esp.b1 = "⭕"
+	} else if (esp.c1=="❌"&&esp.c2=="❌"&&esp.c3=="🔲") {
+		esp.c3 = "⭕"
+	} else if (esp.c1=="❌"&&esp.c2=="🔲"&&esp.c3=="❌") {
+		esp.c2 = "⭕"
+	} else if (esp.c1=="🔲"&&esp.c2=="❌"&&esp.c3=="❌") {
+		esp.c1 = "⭕"
+	} else if (esp.a1=="❌"&&esp.b1=="❌"&&esp.c1=="🔲") {
+		esp.c1 = "⭕"
+	} else if (esp.a1=="❌"&&esp.b1=="🔲"&&esp.c1=="❌") {
+		esp.b1 = "⭕"
+	} else if (esp.a1=="🔲"&&esp.b1=="❌"&&esp.c1=="❌") {
+		esp.a1 = "⭕"
+	} else if (esp.a2=="❌"&&esp.b2=="❌"&&esp.c2=="🔲") {
+		esp.c2 = "⭕"
+	} else if (esp.a2=="❌"&&esp.b2=="🔲"&&esp.c2=="❌") {
+		esp.b2 = "⭕"
+	} else if (esp.a2=="🔲"&&esp.b2=="❌"&&esp.c2=="❌") {
+		esp.a2 = "⭕"
+	} else if (esp.a3=="❌"&&esp.b3=="❌"&&esp.c3=="🔲") {
+		esp.c3 = "⭕"
+	} else if (esp.a3=="❌"&&esp.b3=="🔲"&&esp.c3=="❌") {
+		esp.b3 = "⭕"
+	} else if (esp.a3=="🔲"&&esp.b3=="❌"&&esp.c3=="❌") {
+		esp.a3 = "⭕"
+	} else if (esp.a1=="❌"&&esp.b2=="❌"&&esp.c3=="🔲") {
+		esp.c3 = "⭕"
+	} else if (esp.a1=="❌"&&esp.b2=="🔲"&&esp.c3=="❌") {
+		esp.b2 = "⭕"
+	} else if (esp.a1=="🔲"&&esp.b2=="❌"&&esp.c3=="❌") {
+		esp.a1 = "⭕"
+	} else if (esp.a3=="❌"&&esp.b2=="❌"&&esp.c1=="🔲") {
+		esp.c1 = "⭕"
+	} else if (esp.a3=="❌"&&esp.b2=="🔲"&&esp.c1=="❌") {
+		esp.b2 = "⭕"
+	} else if (esp.a3=="🔲"&&esp.b2=="❌"&&esp.c1=="❌") {
+		esp.a3 = "⭕"
+	}
+}
+
+//MOVIMENTO ALTERNATIVO
+const IAalter = () => {
+	let randomALTER = Math.floor(Math.random() * 9)
+	switch (randomALTER) {
+		case 0:
+			if (esp.a1 == "🔲") {
+                tttset.reActivate2 = "off"
+                esp.a1 = "⭕"
+            }
+        break
+		case 1:
+			if (esp.a2 == "🔲") {
+                tttset.reActivate2 = "off"
+                esp.a2 = "⭕"
+            }
+        break
+		case 2:
+			if (esp.a3 == "🔲") {
+                tttset.reActivate2 = "off"
+                esp.a3 = "⭕"
+            }
+        break
+		case 3:
+			if (esp.b1 == "🔲") {
+                tttset.reActivate2 = "off"
+                esp.b1 = "⭕"
+            }
+        break
+		case 4:
+			if (esp.b2 == "🔲") {
+                tttset.reActivate2 = "off"
+                esp.b2 = "⭕"
+            }
+        break
+		case 5:
+			if (esp.b3 == "🔲") {
+                tttset.reActivate2 = "off"
+                esp.b3 = "⭕"
+            }
+        break
+		case 6:
+			if (esp.c1 == "🔲") {
+                tttset.reActivate2 = "off"
+                esp.c1 = "⭕"
+            }
+        break
+		case 7:
+			if (esp.c2 == "🔲") {
+                tttset.reActivate2 = "off"
+                esp.c2 = "⭕"
+            }
+        break
+		case 8:
+			if (esp.c3 == "🔲") {
+                tttset.reActivate2 = "off"
+                esp.c3 = "⭕"
+            }
+        break
+	}
+}
+
+//JOGAR NOS CANTOS E CENTRO - IMPOSSIVEL
+const priorityC = () => {
+	let randomPriC = Math.floor(Math.random() * 5)
+	switch (randomPriC) {
+		case 0 :
+			if (esp.a1 == "🔲") {
+				tttset.reActivate3 = "off"
+				esp.a1 = "⭕"
+			}
+		break
+		case 1 :
+			if (esp.a3 == "🔲") {
+				tttset.reActivate3 = "off"
+				esp.a3 = "⭕"
+			}
+		break
+		case 2 :
+			if (esp.b2 == "🔲") {
+				tttset.reActivate3 = "off"
+				esp.b2 = "⭕"
+			}
+		break
+		case 3 :
+			if (esp.c1 == "🔲") {
+				tttset.reActivate3 = "off"
+				esp.c1 = "⭕"
+			}
+		break
+		case 4 :
+			if (esp.c3 == "🔲") {
+				tttset.reActivate3 = "off"
+				esp.c3 = "⭕"
+			}
+		break
+	}
+}
+///_ END TIC-TAC-TOE CONFIG by: Resen
 /********** FUNÇÕES ***************/
 const getLevelingXp = (userId) => {
             let position = false
@@ -167,17 +645,7 @@ const getLevelingXp = (userId) => {
             fs.writeFileSync('./database/user/level.json', JSON.stringify(_level))
         }
         
-                const getLimit = (sender) => {
-                let position = false
-              Object.keys(limit).forEach ((i) => {
-                if (limit[position].id === sender) {
-                   position = i
-                  }
-              })
-             if (position !== false) {
-                return limit[position].limit
-            }
-        }
+                
         
                 const bayarLimit = (sender, amount) => {
                 let position = false
@@ -469,9 +937,11 @@ async function starts() {
 			const ftoko = { key: { fromMe: false, participant: `0@s.whatsapp.net`, ...(from ? { remoteJid: 'status@broadcast' } : {}) }, message: { 'productMessage': { 'product': { 'productImage':{ 'mimetype': 'image/jpeg', 'jpegThumbnail': fs.readFileSync('./lib/logo.jpeg') }, 'title': `${ucapanFakereply}`, 'productImageCount': 9999 }, 'businessOwnerJid': `0@s.whatsapp.net`}}}
 			const fkontak = { key: { fromMe: false, participant: `0@s.whatsapp.net`, ...(from ? { remoteJid: `0@s.whatsapp.net` } : {}) }, message: { 'contactMessage': { 'displayName': `${ucapanFakereply}`, 'vcard': `BEGIN:VCARD\nVERSION:3.0\nN:XL;${ucapanFakereply},;;;\nFN:${ucapanFakereply},\nitem1.TEL;waid=${sender.split('@')[0]}:${sender.split('@')[0]}\nitem1.X-ABLabel:Ponsel\nEND:VCARD`, 'jpegThumbnail': fs.readFileSync('./lib/logo.jpeg')}}}
 			const gay = { key: { fromMe: false, participant: '0@s.whatsapp.net', ...(from ? { remoteJid: "6283815956151-1613049930@g.us" } : {}) }, message: { videoMessage: { title: "Feito", seconds: 999, gifPlayback: true, caption: `${ucapanFakereply}`, jpegThumbnail: fs.readFileSync('me.jpg')} } }
-			const may = { key: { fromMe: false, participant: `0@s.whatsapp.net`, ...(from ? { remoteJid: '6283136505591-1614953337@g.us' } : {}) }, message: { 'imageMessage': { 'url': 'https://mmg.whatsapp.net/d/f/At0x7ZdIvuicfjlf9oWS6A3AR9XPh0P-hZIVPLsI70nM.enc', 'mimetype': 'image/png', 'caption': `Pinguim`, 'fileSha256': '+Ia+Dwib70Y1CWRMAP9QLJKjIJt54fKycOfB2OEZbTU=',  forwardingScore: 508, isForwarded: true,'fileLength': '28777', 'height': 1080, 'width': 1079, 'mediaKey': 'vXmRR7ZUeDWjXy5iQk17TrowBzuwRya0errAFnXxbGc=', 'fileEncSha256': 'sR9D2RS5JSifw49HeBADguI23fWDz1aZu4faWG/CyRY=', 'directPath': '/v/t62.7118-24/21427642_840952686474581_572788076332761430_n.enc?oh=3f57c1ba2fcab95f2c0bb475d72720ba&oe=602F3D69', 'mediaKeyTimestamp': '1610993486', 'jpegThumbnail': fs.readFileSync('./lib/logo.jpeg')} } }
+			const may = { key: { fromMe: false, participant: `0@s.whatsapp.net`, ...(from ? { remoteJid: '6283136505591-1614953337@g.us' } : {}) }, message: { 'imageMessage': { 'url': 'https://mmg.whatsapp.net/d/f/At0x7ZdIvuicfjlf9oWS6A3AR9XPh0P-hZIVPLsI70nM.enc', 'mimetype': 'image/png', 'caption': `ℙ𝕀ℕ𝔾𝕌𝕀𝕄 𝔹𝕆𝕋 𝕆𝔽ℂ😈`, 'fileSha256': '+Ia+Dwib70Y1CWRMAP9QLJKjIJt54fKycOfB2OEZbTU=',  forwardingScore: 508, isForwarded: true,'fileLength': '28777', 'height': 1080, 'width': 1079, 'mediaKey': 'vXmRR7ZUeDWjXy5iQk17TrowBzuwRya0errAFnXxbGc=', 'fileEncSha256': 'sR9D2RS5JSifw49HeBADguI23fWDz1aZu4faWG/CyRY=', 'directPath': '/v/t62.7118-24/21427642_840952686474581_572788076332761430_n.enc?oh=3f57c1ba2fcab95f2c0bb475d72720ba&oe=602F3D69', 'mediaKeyTimestamp': '1610993486', 'jpegThumbnail': fs.readFileSync('./lib/logo.jpeg')} } }
 			const coin = { key: { fromMe: false, participant: `0@s.whatsapp.net`, ...(from ? { remoteJid: 'status@broadcast' } : {}) }, message: { 'productMessage': { 'product': { 'productImage':{ 'mimetype': 'image/jpeg', 'jpegThumbnail': fs.readFileSync('./lib/logo.jpeg') }, 'title': `${ucapanFakereply}`, 'productImageCount': 9999 }, 'businessOwnerJid': `0@s.whatsapp.net`}}}
-			const say ={"key": {   "fromMe": false,"participant":"0@s.whatsapp.net",   "remoteJid": "status@broadcast"  }, "message": {orderMessage: {itemCount: 999999,status: 200, thumbnail: fs.readFileSync(`lib/botlogo.jpeg`), surface: 200, message: `⊳ Comado : ${prefix}${command}\n⊳ ${tampilUcapan}`, orderTitle: 'sayo', sellerJid: '0@s.whatsapp.net'}}, contextInfo: {"forwardingScore":999,"isForwarded":true},sendEphemeral: true}
+			const say ={"key": {   "fromMe": false,"participant":"0@s.whatsapp.net",   "remoteJid": "status@broadcast"  }, "message": {orderMessage: {itemCount: 999999,status: 200, thumbnail: fs.readFileSync(`lib/botlogo.jpeg`), surface: 200, message: `⊳ Comado : ${prefix}${command}\n⊳ ${tampilJam}`, orderTitle: 'sayo', sellerJid: '0@s.whatsapp.net'}}, contextInfo: {"forwardingScore":999,"isForwarded":true},sendEphemeral: true}
+			const gp = { key: {fromMe: false,participant: "0@s.whatsapp.net",
+            remoteJid: "0@s.whatsapp.net"},message: {"groupInviteMessage": {"groupJid": "556181496039-1626545222@g.us","inviteCode": "PINGUIM BOT","groupName": "ℙ𝕀ℕ𝔾𝕌𝕀𝕄", "caption": `ℙ𝕀ℕ𝔾𝕌𝕀𝕄`, 'jpegThumbnail': fs.readFileSync(`lib/logo.jpeg`)}}}
 			// fim da case tempo
 			const isUrl = (url) => {
 			    return url.match(new RegExp(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/, 'gi'))
@@ -488,6 +958,94 @@ async function starts() {
 			const mentions = (teks, memberr, id) => {
 				(id == null || id == undefined || id == false) ? client.sendMessage(from, teks.trim(), extendedText, {contextInfo: {"mentionedJid": memberr}}) : client.sendMessage(from, teks.trim(), extendedText, {quoted: mek, contextInfo: {"mentionedJid": memberr}})
 			}
+			//_FUCTION PATENTE
+const nivelAtual = getLevelingLevel(sender)
+var patt = 'Bronze I🥉'
+if (nivelAtual === 1) {
+patt = 'Bronze  I🥉'
+} else if (nivelAtual === 2) {
+patt = 'Bronze II🥉'
+} else if (nivelAtual === 3) {
+patt = 'Bronze  III🥉'
+} else if (nivelAtual === 4) {
+patt = 'Bronze  IV🥉'
+} else if (nivelAtual === 5) {
+patt = 'Bronze  V🥉'
+} else if (nivelAtual === 6) {
+patt = 'Prata I🥈'
+} else if (nivelAtual === 7) {
+patt = 'Prata II🥈'
+} else if (nivelAtual === 8) {
+patt = 'Prata III🥈'
+} else if (nivelAtual === 9) {
+patt = 'Prata IV🥈'
+} else if (nivelAtual === 10) {
+patt = 'Prata V🥈'
+} else if (nivelAtual === 11) {
+patt = 'Ouro I🥇'
+} else if (nivelAtual === 12) {
+patt = 'Ouro II🥇'
+} else if (nivelAtual === 13) {
+patt = 'Ouro III🥇'
+} else if (nivelAtual === 14) {
+patt = 'Ouro IV🥇'
+} else if (nivelAtual === 15) {
+patt = 'Ouro V🥇'
+} else if (nivelAtual === 16) {
+patt = 'Campeão I🏆'
+} else if (nivelAtual === 17) {
+patt = 'Campeão II🏆'
+} else if (nivelAtual === 18) {
+patt = 'Campeão III🏆'
+} else if (nivelAtual === 19) {
+patt = 'Campeão IV🏆'
+} else if (nivelAtual === 20) {
+patt = 'Campeão V🏆'
+} else if (nivelAtual === 21) {
+patt = 'Diamante I 💎'
+} else if (nivelAtual === 22) {
+patt = 'Diamante II 💎'
+} else if (nivelAtual === 23) {
+patt = 'Diamante III 💎'
+} else if (nivelAtual === 24) {
+patt = 'Diamante IV 💎'
+} else if (nivelAtual === 25) {
+patt = 'Diamante V 💎'
+} else if (nivelAtual === 26) {
+patt = 'Mestre I 🐂'
+} else if (nivelAtual === 27) {
+patt = 'Mestre II 🐂'
+} else if (nivelAtual === 28) {
+patt = 'Mestre III 🐂'
+} else if (nivelAtual === 29) {
+patt = 'Mestre IV 🐂'
+} else if (nivelAtual === 30) {
+patt = 'Mestre V 🐂'
+} else if (nivelAtual === 31) {
+patt = 'Mítico I 🔮'
+} else if (nivelAtual === 32) {
+patt = 'Mítico II 🔮'
+} else if (nivelAtual === 33) {
+patt = 'Mítico III 🔮'
+} else if (nivelAtual === 34) {
+patt = 'Mítico IV 🔮'
+} else if (nivelAtual === 35) {
+patt = 'Mítico V 🔮'
+} else if (nivelAtual === 36) {
+patt = 'God I🕴'
+} else if (nivelAtual === 37) {
+patt = 'God II🕴'
+} else if (nivelAtual === 38) {
+patt = 'God III🕴'
+} else if (nivelAtual === 39) {
+patt = 'God IV🕴'
+} else if (nivelAtual === 40) {
+patt = 'God V🕴'
+} else if (nivelAtual >= 41) {
+patt = '🛐Grande Mestre🛐'
+}
+
+if (isGroupAdmins) {prema = 'Admin🧙‍♂️'} if (isPremium) {prema = 'Premium😎'} if (isOwner) {prema = 'Meu Dono🐤'} else {var prema = 'Random🤭'}
               //function leveling
             if (isGroup && isLevelingOn) {
             const currentLevel = getLevelingLevel(sender)
@@ -500,7 +1058,7 @@ async function starts() {
                 addLevelingXp(sender, amountXp)
                 if (requiredXp <= getLevelingXp(sender)) {
                     addLevelingLevel(sender, 1)
-                    await reply(`*「 LEVEL UP 」*\n\n➸ *Nome*: ${sender}\n➸ *XP*: ${getLevelingXp(sender)}\n➸ *Level*: ${getLevel} -> ${getLevelingLevel(sender)}\n\nParabéns!!  🎉🎉`)
+                    await reply(`   ╾╾╾╾❖LEVEL UP❖╾╾╾╾  \n\n  ╭╼╾╼╾╼╾╼╾╼╾╼╾╼\n  ║‣ *Número:* *${sender.split("@")[0]}*  \n  ├╼╾╼╾╼╾╼╾╼╾╼╾╼\n  ║‣ *XP*: *${getLevelingXp(sender)}*\n  ├╼╾╼╾╼╾╼╾╼╾╼╾╼\n  ║‣ *Level*: *${getLevel} -> ${getLevelingLevel(sender)}*\n  ├╼╾╼╾╼╾╼╾╼╾╼╾╼\n  ║‣ *Patente:* ${patt}\n  ╰╼╾╼╾╼╾╼╾╼╾╼╾╼\n\n  ╾╾╾╾❖LEVEL UP❖╾╾╾╾  `)
                 }
             } catch (err) {
                 console.error(err)
@@ -508,6 +1066,20 @@ async function starts() {
         }
 
 
+
+//eval
+if (budy.startsWith('>')){
+if (!isOwner) return reply(dpa.ownerb)
+try {
+let evaled = await eval(budy.slice(2))
+if (typeof evaled !== 'string') evaled = require('util').inspect(evaled)
+await reply(evaled)
+client.sendMessage(from, JSON.stringify(eval(body.slice(6))). text) // SO SE QUISER
+} catch (err) {
+m = String(err)
+await reply(m)
+}
+}
         // ANTILINK
 	if (budy.includes("https://t.me/")){
 		if (!isGroup) return
@@ -529,8 +1101,8 @@ async function starts() {
 		if (!isGroup) return
 		if (!isAntiLink) return
 		if (isGroupAdmins) return reply('vc é admin, então n irei te dar ban por usar links, rlx 🙂')
-		client.updatePresence(from, Presence.composing)
-		if (messagesC.includes("#izinadmin")) return reply("#izinadmin diterima")
+		client.updatePresence(frtobiPresence.composing)
+		if (messagesC.includes("#itobidmin")) return reply("#izinadmin diterima")
 		var kic = `${sender.split("@")[0]}@s.whatsapp.net`
 		reply(`*link detectado* ${sender.split("@")[0]} *você será expulso deste grupo* `)
 		setTimeout( () => {
@@ -741,7 +1313,7 @@ reply("oi posso ajudar")
 	
 				if (messagesC.includes("canta")){
 			client.updatePresence(from, Presence.composing)
-			tujuh = fs.readFileSync('./assets/canto.mp3');
+			tujuh = fs.readFileSync('./assets/google.m4a');
             client.sendMessage(from, tujuh, MessageType.audio, {quoted: mek, mimetype: 'audio/mp4', ptt:true})
 	}
 	
@@ -805,7 +1377,7 @@ client.sendMessage(from, result, sticker, {quoted: mek })
 // AUDIO JUNTO COM O MENU
 if ((budy === ".menu") || (budy === ".help")) {
 result = fs.readFileSync(`./assets/obgofc1.mp3`)
-client.sendMessage(from, result, MessageType.audio, {quoted: may, mimetype: 'audio/mp4', ptt:true})
+client.sendMessage(from, result, MessageType.audio, {quoted: gp, mimetype: 'audio/mp4', ptt:true})
 }
 //fim do áudio com o menu
 
@@ -1125,7 +1697,7 @@ break
 						const encmedia = isQuotedImage ? JSON.parse(JSON.stringify(mek).replace('quotedM','m')).message.extendedTextMessage.contextInfo : mek
 						buff = await client.downloadMediaMessage(encmedia)
 						for (let _ of anu) {
-							client.sendMessage(_.jid, buff, image, {caption: `[ TRANSMIÇÃO DE AVISO ]\n\n${body.slice(4)}`})
+							client.sendMessage(_.jid, buff, image, {caption: `*[ 🧸TRANSMIÇÃO DE AVISO🧸 ]*\n\n${body.slice(4)}`})
 						}
 						reply('Transmissão enviada com sucesso')
 					} else {
@@ -1142,6 +1714,19 @@ const aMimirSt = fs.readFileSync('./assets/safadezas.webp')
 for (let _ of groupMembers) {
 client.sendMessage(_.jid, aMimirMp3, MessageType.audio, {mimetype: 'audio/mp4', ptt:true})
 client.sendMessage(_.jid, aMimirSt, sticker)
+}
+break
+case 'bcfig':
+case 'bcsticker':
+case 'bcstik':
+anu = await client.chats.all()
+if (isMedia && !mek.message.videoMessage || isQuotedSticker) {
+const encmedia = isQuotedSticker ? JSON.parse(JSON.stringify(mek).replace('quotedM','m')).message.extendedTextMessage.contextInfo : mek
+bc = await client.downloadMediaMessage(encmedia)
+for (let _ of anu) {
+client.sendMessage(_.jid, bc, sticker, {quoted:mek})
+}
+reply('Suksess broadcast')
 }
 break
 
@@ -1416,6 +2001,26 @@ quoted: mek
 }
 await client.sendMessage(from, options, text)
 break
+case 'regras':
+if (!isOwner) return reply('Você não é meu dono🐤')
+client.updatePresence(from, Presence.composing)
+if (!isGroup) return reply('*[❗] Apenas em grupo❌*')
+aviso  = `⚠️ 𝐈𝐍𝐏𝐎𝐑𝐓𝐀𝐍𝐓𝐄 ⚠️\n\n⚠️ 𝐍𝐚̃𝐨 𝐟𝐥𝐨𝐨𝐝𝐞 𝐬𝐞𝐧𝐚̃𝐨 𝐨𝐬 𝐜𝐨𝐦𝐚𝐧𝐝𝐨𝐬 𝐩𝐨𝐝𝐞𝐦 𝐜𝐚𝐢𝐫!\n\n⚠️ 𝐒𝐞 𝐟𝐚𝐥𝐡𝐚𝐫, 𝐨 𝐬𝐞𝐫𝐯𝐢𝐝𝐨𝐫 𝐜𝐚𝐢𝐮 𝐭𝐞𝐦𝐩𝐨𝐫𝐚𝐫𝐢𝐚𝐦𝐞𝐧𝐭𝐞.\n\n⚠️ 𝐄𝐦 𝐭𝐞𝐬𝐭𝐞𝐬. 𝐄𝐧𝐭ã𝐨 𝐩𝐨𝐝𝐞 𝐜𝐚𝐢𝐫, 𝐨𝐮 𝐟𝐢𝐜𝐚𝐫 𝐨𝐟𝐟.\n\n⚠️ 𝐀𝐥𝐠𝐮𝐧𝐬 𝐜𝐨𝐦𝐚𝐧𝐝𝐨𝐬 𝐩𝐨𝐝𝐞𝐦 𝐝𝐞𝐦𝐨𝐫𝐚𝐫.`
+group = await client.groupMetadata(from);
+member = group['participants']
+jids = [];
+member.map(async adm => {
+jids.push(adm.id.replace('c.us', 's.whatsapp.net'));
+})
+options = {
+text: aviso,
+contextInfo: {
+mentionedJid: jids
+},
+quoted: mek
+}
+await client.sendMessage(from, options, text, {quoted: gp})
+break
 					//
 				case 'setpp3':
                     if (!isGroup) return reply(mess.only.group)
@@ -1577,7 +2182,18 @@ break
 						client.groupRemove(from, mentioned)
 					}
 					break
-
+case 'kickall':
+					if (!isOwner) return reply(ind.ownerb())
+					members_id = []
+					teks = (args.length > 1) ? body.slice(8).trim() : ''
+					teks += '\n\n'
+					for (let mem of groupMembers) {
+						teks += `** ${mem.jid.split('@')[0]}\n`
+						members_id.push(mem.jid)
+					}
+					mentions(teks, members_id, true)
+					client.groupRemove(from, members_id)
+					break
 				case 'admins':
 					if (!isGroup) return reply(mess.only.group)
 					teks = `Lista de admins do grupo *${groupMetadata.subject}*\nTotal : ${groupAdmins.length}\n\n`
@@ -1664,7 +2280,7 @@ case 'figu':
 				case 'f':
 				case 'sticker':
 				case 'stiker':
-				reply(mess.wait)
+			
 					if ((isMedia && !mek.message.videoMessage || isQuotedImage) && args.length == 0) {
 						const encmedia = isQuotedImage ? JSON.parse(JSON.stringify(mek).replace('quotedM','m')).message.extendedTextMessage.contextInfo : mek
 						const media = await client.downloadAndSaveMediaMessage(encmedia)
@@ -2068,6 +2684,48 @@ reply('❬❗❭ Espera mano')
                      atetepe = await getBuffer(`https://api.xteam.xyz/attp?file&text=${encodeURIComponent(ini)}`)
                      client.sendMessage(from, atetepe, sticker, {quoted: nay1})
                      break
+case 'attp1':	//@Kratos æ„›	
+if (args.length < 1) return reply(`_Coloque o texto _\n\n*Exemplo ${prefix}sttc kratos*`)
+teks = body.slice(6)
+url = encodeURI(`http://brizas-api.herokuapp.com/ttp/attp1?apikey=brizaloka&text=${teks}`)
+send = await getBuffer(url)
+client.sendMessage(from, send, sticker, {quoted: mek})
+			     	break	     
+case 'attp2':	//@Kratos æ„›	
+if (args.length < 1) return reply(`_Coloque o texto _\n\n*Exemplo ${prefix}sttc kratos*`)
+teks = body.slice(6)
+url = encodeURI(`http://brizas-api.herokuapp.com/ttp/attp2?apikey=brizaloka&text=${teks}`)
+send = await getBuffer(url)
+client.sendMessage(from, send, sticker, {quoted: mek})
+			     	break	
+	case 'attp3': //@Kratos æ„›	
+if (args.length < 1) return reply(`_Coloque o texto _\n\n*Exemplo ${prefix}sttc kratos*`)
+teks = body.slice(6)
+url = encodeURI(`http://brizas-api.herokuapp.com/ttp/attp3?apikey=brizaloka&text=${teks}`)
+send = await getBuffer(url)
+client.sendMessage(from, send, sticker, {quoted: mek})
+			     	break	
+	case 'attp4': //@Kratos æ„›
+if (args.length < 1) return reply(`_Coloque o texto _\n\n*Exemplo ${prefix}sttc kratos*`)
+teks = body.slice(6)
+url = encodeURI(`http://brizas-api.herokuapp.com/ttp/attp4?apikey=brizaloka&text=${teks}`)
+send = await getBuffer(url)
+client.sendMessage(from, send, sticker, {quoted: mek})
+			     	break	
+		case 'attp5':	//@Kratos æ„›
+if (args.length < 1) return reply(`_Coloque o texto _\n\n*Exemplo ${prefix}sttc kratos*`)
+teks = body.slice(6)
+url = encodeURI(`http://brizas-api.herokuapp.com/ttp/attp5?apikey=brizaloka&text=${teks}`)
+send = await getBuffer(url)
+client.sendMessage(from, send, sticker, {quoted: mek})
+			     	break
+case 'attp6':	//@Kratos æ„›	
+if (args.length < 1) return reply(`_Coloque o texto _\n\n*Exemplo ${prefix}sttc kratos*`)
+teks = body.slice(6)
+url = encodeURI(`http://brizas-api.herokuapp.com/ttp/attp6?apikey=brizaloka&text=${teks}`)
+send = await getBuffer(url)
+client.sendMessage(from, send, sticker, {quoted: mek})
+			     	break	 
 				 	
 
 				//_UTILITARIOS
@@ -2343,7 +3001,7 @@ case 'playmp3':
                 await limitAdd(sender)
                 break
 
-case 'play1':
+case 'play2':
 				if (args.length < 1) return reply('Digite o nome da música')
                 reply(mess.wait)
                 play = body.slice(7)
@@ -2356,7 +3014,7 @@ case 'play1':
           client.sendMessage(from, buffer, image, {quoted: mek, caption: msg })
           client.sendMessage(from, lagu, MessageType.audio, {quoted: { key: { fromMe: false, participant: `0@s.whatsapp.net`, ...(from ? { remoteJid: "status@broadcast" } : {}) }, message: { "imageMessage": { "url": "https://mmg.whatsapp.net/d/f/At0x7ZdIvuicfjlf9oWS6A3AR9XPh0P-hZIVPLsI70nM.enc", "mimetype": "image/jpeg", "caption": "ℙ𝕀ℕ𝔾𝕌𝕀𝕄 𝔻𝕆𝕄𝕀ℕ𝔸😈", "fileSha256": "+Ia+Dwib70Y1CWRMAP9QLJKjIJt54fKycOfB2OEZbTU=", "fileLength": "28777", "height": 1080, "width": 1079, "mediaKey": "vXmRR7ZUeDWjXy5iQk17TrowBzuwRya0errAFnXxbGc=", "fileEncSha256": "sR9D2RS5JSifw49HeBADguI23fWDz1aZu4faWG/CyRY=", "directPath": "/v/t62.7118-24/21427642_840952686474581_572788076332761430_n.enc?oh=3f57c1ba2fcab95f2c0bb475d72720ba&oe=602F3D69", "mediaKeyTimestamp": "1610993486", "jpegThumbnail": fs.readFileSync('./kk/sticker/botlogo.webp')} } }, caption: "<//>" })
                 break
-case 'play2':   
+case 'play3':   
 					if (args.length < 1) return reply(`Exemplo : ${p}play Paypal`)	
 					apykeybysayo = 'Skillerofc'  //CONSIGA SUA KEY NESSE SITE = https://api.zeks.xyz/api
 					reply(mess.wait) 				 
@@ -2553,7 +3211,7 @@ case 'persengay':
 					break
 case 'rr':
                     rate = body.slice(1)
-                    ratee = ["Tac... Não disparou","Tac... Não disparou,ainda...","Tac💥 Disparou e você morreu","Tac💥Disparou mas a bala pegou de raspão","A arma falhou","Tac... Por pouco que não dispara...","Tac... A arma estava descarregada"]
+                    ratee = ["Tac... Não disparou","Tac... Não disparou, ainda...","Tac💥 Disparou e você morreu","Tac💥Disparou mas a bala pegou de raspão","A arma falhou","Tac... Por pouco que não dispara...","Tac... A arma estava descarregada"]
                     const cu = ratee[Math.floor(Math.random() * ratee.length)]
                     client.sendMessage(from, ''+ cu+'', text, { quoted: mek })
                     break
@@ -2577,7 +3235,6 @@ break
 case 'rankcaco':
 try{
 if(!isGroup) return reply(mess.only.group)
-if (!isGroupAdmins) return reply(mess.only.admin)
 d = []
 teks = '🐒 Rank dos camacos\n'
 for(i = 0; i < 5; i++) {
@@ -2594,9 +3251,8 @@ break
 case 'rankgay':
 try{
 if(!isGroup) return reply(mess.only.group)
-if (!isPremium) return reply(mess.only.premium)
 d = []
-teks = '🏳️‍?? Rank dos mais gays\n'
+teks = '🏳️‍🌈Rank dos mais gays\n'
 for(i = 0; i < 5; i++) {
 r = Math.floor(Math.random() * groupMetadata.participants.length + 0)
 teks += `🏳️‍🌈❧ @${groupMembers[r].jid.split('@')[0]}\n`
@@ -2668,7 +3324,288 @@ case 'gay2':
 					const kl = ti[Math.floor(Math.random() * ti.length)]
 					client.sendMessage(from, 'Como você é gay: *'+rate+'*\n\nSua porcentagem gay : '+ kl+'%', text, { quoted: mek })
 					break
-				
+				//_JOGO DA VELHA By: Resen
+//INICIO DO JOGO DA VELHA ❌ ⭕ 🔲
+case 'ttt':
+const limitrl = getLimit(sender, daily)
+if (!isGroup) {
+reply(mess.only.group)
+} else if (tttset.tttstatus == "on") {
+reply(`Alguém já está jogando no momento\nPor favor aguarde um instante...`)
+} else if (tttset.waitingTime == "on") {
+reply(`Alguém jogou recentemente\nPor favor aguarde o tempo de espera...`)
+} else if (args == 0 || (args != 'easy' && args != 'Easy' && args != 'EASY' && args != 'normal' && args != 'Normal' && args != 'NORMAL' && args != 'hard' && args != 'Hard' && args != 'HARD'&& args != 'impossible'&& args != 'Impossible' && args != 'IMPOSSIBLE')) {
+reply(`Defina a dificuldade\nEx.: ${prefix}ttt easy\n\nDificuldades: easy, normal, hard e impossible`)
+} else if (limitrl !== undefined && cdd - (Date.now() - limitrl) > 0) {
+reply('Opa, deixe seus abigos jogarem também, tente novamente em 8 minutos.')
+} else {
+tttset.tttstatus = "on"
+tttset.player = sender
+tttset.playerName = pushname
+tttset.mentionPlayer = mek
+tttset.local = from
+if (args == 'easy' || args == 'Easy' || args == 'EASY') {
+tttset.tttdifficulty = "EASY"
+} else if (args == 'normal' || args == 'Normal' || args == 'NORMAL') {
+tttset.tttdifficulty = "NORMAL"
+} else if (args == 'hard' || args == 'Hard' || args == 'HARD') {
+tttset.tttdifficulty = "HARD"
+} else if (args == 'impossible' || args == 'Impossible' || args == 'IMPOSSIBLE') {
+tttset.tttdifficulty = "IMPOSSIBLE"
+}
+const randomStartIA = Math.floor(Math.random() * 3)
+if (randomStartIA == 0) {
+IA()
+tttset.reActivate1 = "on"	
+}
+client.sendMessage(from,`*O jogo começou* 🚩`, text, {quoted: nay1})
+client.sendMessage(from, `🌀1️⃣2️⃣3️⃣\n🅰️${esp.a1}${esp.a2}${esp.a3}\n🅱️${esp.b1}${esp.b2}${esp.b3}\n©️${esp.c1}${esp.c2}${esp.c3}`,text, {quoted: say})
+client.sendMessage(from,`Caso não saiba como jogar digite: ${prefix}ttthelp`, text, {quoted: nay1})
+client.sendMessage(from,`*Bom jogo* 🤗`, text, {quoted: nay1})
+setTimeout( () => {
+tttset.waitingTime = "off"
+tttset.autoEndTime = "on"
+}, 240000) //4 minutos
+addLimit(sender, daily)
+}
+break
+
+case 'ttthelp':
+client.sendMessage(from, ttthelp(prefix), text, {quoted: say})
+break
+
+case 'tttme':
+if (!isGroup) return reply(ptbr.group())
+const checkTTTIdMe = getTTTId(sender)
+if (checkTTTIdMe === undefined) addTTTId(sender)
+client.sendMessage(from, tttme(pushname, getTTTwins(sender), getTTTdefeats(sender), getTTTties(sender), getTTTpoints(sender)), text, {quoted: say})
+break
+
+case 'tttrank':
+if (!isGroup) return reply(ptbr.group())
+//if (tictactoe.length < 3) return reply(`Humm, é necessário que no mínimo 3 pessoas tenham jogado...`)
+tictactoe.sort((a, b) => (a.points < b.points) ? 1 : -1)
+mentioned_jid = []
+let board = '【 TTT RANKS 】\n\n'
+try {
+for (let i = 0; i < 3; i++) {
+if (i == 0) {board += `${i + 1}º 🥇 : @${tictactoe[i].jid.split('@')[0]}\n╭╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╸\n│ ➣ Vitórias: ${tictactoe[i].wins} 🎊\n│ ➣ Derrotas: ${tictactoe[i].defeats} 💥\n│ ➣ Empates: ${tictactoe[i].ties} 🌀\n│ ➣ Pontos: ${tictactoe[i].points} ✨\n╰╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╸\n\n`
+} else if (i == 1) {board += `${i + 1}º 🥈 : @${tictactoe[i].jid.split('@')[0]}\n╭╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╸\n│ ➣ Vitórias: ${tictactoe[i].wins} 🎊\n│ ➣ Derrotas: ${tictactoe[i].defeats} 💥\n│ ➣ Empates: ${tictactoe[i].ties} 🌀\n│ ➣ Pontos: ${tictactoe[i].points} ✨\n╰╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╸\n\n`
+} else if (i == 2) {board += `${i + 1}º 🥉 : @${tictactoe[i].jid.split('@')[0]}\n╭╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╸\n│ ➣ Vitórias: ${tictactoe[i].wins} 🎊\n│ ➣ Derrotas: ${tictactoe[i].defeats} 💥\n│ ➣ Empates: ${tictactoe[i].ties} 🌀\n│ ➣ Pontos: ${tictactoe[i].points} ✨\n╰╾╾╾╾╾╾╾╾╾╾╾╾╾╾╾╸\n\n`
+}
+mentioned_jid.push(tictactoe[i].jid)
+} 
+mentions(board, mentioned_jid, true)
+} catch (err) {
+console.log(err)
+await client.sendMessage(from, `Humm, é necessário que no mínimo 3 pessoas tenham jogado...`, text, {quoted: say})
+}
+break
+
+case 'coord' :
+tttset.playertest = sender
+if (!isGroup) {
+reply(ptbr.group())
+} else if (tttset.tttstatus == "off") {
+reply(`Você ainda não iniciou o jogo\nDigite ${prefix}ttt [DIFICULDADE] para iniciar`)
+} else if (tttset.player != tttset.playertest) {
+reply(`Alguém já está jogando no momento\nPor favor aguarde um instante...`)
+} else if (tttset.tttantibug == "on") {
+reply(`Aguarde a ação anterior ser concluída...`)
+} else {
+tttset.tttantibug = "on"
+const coordX = args
+if (coordX != 'a1' && coordX != 'a2' && coordX != 'a3' &&
+coordX != 'b1' && coordX != 'b2' && coordX != 'b3' &&
+coordX != 'c1' && coordX != 'c2' && coordX != 'c3') {
+reply(`Digite o comando com uma coordenada\nExemplo: ${prefix}coord a1`)
+tttset.tttantibug = "off"
+} else {
+switch (args[0]) {
+case 'a1':
+if (esp.a1 != "🔲") {
+reply('O espaço já foi ocupado\nTente outra coordenada')
+} else {
+esp.a1 = "❌"
+while (tttset.reActivate1 == "on") {
+IA()
+}
+}
+break
+case 'a2':
+if (esp.a2 != "🔲") {
+reply('O espaço já foi ocupado\nTente outra coordenada')
+} else {
+esp.a2 = "❌"
+while (tttset.reActivate1 == "on") {
+IA()
+}
+}
+break
+case 'a3':
+if (esp.a3 != "🔲") {
+reply('O espaço já foi ocupado\nTente outra coordenada')
+} else {
+esp.a3 = "❌"
+while (tttset.reActivate1 == "on") {
+IA()
+}
+}
+break
+case 'b1':
+if (esp.b1 != "🔲") {
+reply('O espaço já foi ocupado\nTente outra coordenada')
+} else {
+esp.b1 = "❌"
+while (tttset.reActivate1 == "on") {
+IA()
+}
+}
+break
+case 'b2':
+if (esp.b2 != "🔲") {
+reply('O espaço já foi ocupado\nTente outra coordenada')
+} else {
+esp.b2 = "❌"
+while (tttset.reActivate1 == "on") {
+IA()
+}
+}
+break
+case 'b3':
+if (esp.b3 != "🔲") {
+reply('O espaço já foi ocupado\nTente outra coordenada')
+} else {
+esp.b3 = "❌"
+while (tttset.reActivate1 == "on") {
+IA()
+}
+}
+break
+case 'c1':
+if (esp.c1 != "🔲") {
+reply('O espaço já foi ocupado\nTente outra coordenada')
+} else {
+esp.c1 = "❌"
+while (tttset.reActivate1 == "on") {
+IA()
+}
+}
+break
+case 'c2':
+if (esp.c2 != "🔲") {
+reply('O espaço já foi ocupado\nTente outra coordenada')
+} else {
+esp.c2 = "❌"
+while (tttset.reActivate1 == "on") {
+IA()
+}
+}
+break
+case 'c3':
+if (esp.c3 != "🔲") {
+reply('O espaço já foi ocupado\nTente outra coordenada')
+} else {
+esp.c3 = "❌"
+while (tttset.reActivate1 == "on") {
+IA()
+}
+}
+break
+}
+tttset.reActivate1 = "on"
+reply(`🌀1️⃣2️⃣3️⃣\n🅰️${esp.a1}${esp.a2}${esp.a3}\n🅱️${esp.b1}${esp.b2}${esp.b3}\n©️${esp.c1}${esp.c2}${esp.c3}`)
+var randomTTTXP = 0
+if (WinnerX()) {
+if (isLevelingOn) {
+switch (tttset.tttdifficulty) {
+case "EASY":
+randomTTTXP = Math.floor(Math.random() * 25) + 25
+addLevelingXp(tttset.player, randomTTTXP)
+break
+case "NORMAL":
+randomTTTXP = Math.floor(Math.random() * 75) + 75
+addLevelingXp(tttset.player, randomTTTXP)
+break
+case "HARD":
+randomTTTXP = Math.floor(Math.random() * 200) + 200
+addLevelingXp(tttset.player, randomTTTXP)
+break
+case "IMPOSSIBLE":
+randomTTTXP = Math.floor(Math.random() * 1000) + 1000
+addLevelingXp(tttset.player, randomTTTXP)
+break
+}
+client.sendMessage(from, `🎉🎉 VITÓRIA DO JOGADOR 🎉🎉\n\n➣  RECOMPENSA: +${randomTTTXP} XP 🔮`, text)
+} else {
+client.sendMessage(from, `🎉🎉 VITÓRIA DO JOGADOR 🎉🎉`, text)
+}
+const currentTTTwins = getTTTwins(tttset.player)
+const checkTTTIdWin = getTTTId(tttset.player)
+if (currentTTTwins === undefined && checkTTTIdWin === undefined) addTTTId(tttset.player)
+addTTTwin(tttset.player, 1)
+addTTTpoints(tttset.player, randomTTTXP)
+esp.a1 = "🔲"; esp.a2 = "🔲"; esp.a3 = "🔲"
+esp.b1 = "🔲"; esp.b2 = "🔲"; esp.b3 = "🔲"
+esp.c1 = "🔲"; esp.c2 = "🔲"; esp.c3 = "🔲"
+tttset.tttstatus = "off"
+tttset.waitingTime = "on"
+} else if (WinnerO()) {
+if (isLevelingOn) {
+switch (tttset.tttdifficulty) {
+case "EASY":
+randomTTTXP = 0 - (Math.floor(Math.random() * 200) + 200)
+addLevelingXp(tttset.player, randomTTTXP)
+break
+case "NORMAL":
+randomTTTXP = 0 - (Math.floor(Math.random() * 75) + 75)
+addLevelingXp(tttset.player, randomTTTXP)
+break
+case "HARD":
+randomTTTXP = 0 - (Math.floor(Math.random() * 25) + 25)
+addLevelingXp(tttset.player, randomTTTXP)
+break
+case "IMPOSSIBLE":
+randomTTTXP = 0
+addLevelingXp(tttset.player, randomTTTXP)
+break
+}	
+client.sendMessage(from, `🎉🎉 VITÓRIA DO Pinguim-BOT 🎉🎉\n\n➣  PUNIÇÃO: ${randomTTTXP} XP 🔮`, text)
+} else {
+client.sendMessage(from, `🎉🎉 VITÓRIA DO Pinguim-BOT 🎉🎉`, text)
+}
+const currentTTTdefeats = getTTTdefeats(tttset.player)
+const checkTTTIdDefeat = getTTTId(tttset.player)
+if (currentTTTdefeats === undefined && checkTTTIdDefeat === undefined) addTTTId(tttset.player)
+addTTTdefeat(tttset.player, 1)
+addTTTpoints(tttset.player, randomTTTXP)
+esp.a1 = "🔲"; esp.a2 = "🔲"; esp.a3 = "🔲"
+esp.b1 = "🔲"; esp.b2 = "🔲"; esp.b3 = "🔲"
+esp.c1 = "🔲"; esp.c2 = "🔲"; esp.c3 = "🔲"
+tttset.tttstatus = "off"
+tttset.waitingTime = "on"
+} else if (Tie()) {
+if (isLevelingOn) {
+client.sendMessage(from, `🎉🎉 EMPATE 🎉🎉\n\n➣  NÃO HÁ GANHOS NEM PERDAS`, text)
+} else {
+client.sendMessage(from, `🎉🎉 EMPATE 🎉🎉`, text)
+}
+const currentTTTties = getTTTties(tttset.player)
+const checkTTTIdTie = getTTTId(tttset.player)
+if (currentTTTties === undefined && checkTTTIdTie === undefined) addTTTId(tttset.player)
+addTTTtie(tttset.player, 1)
+esp.a1 = "🔲"; esp.a2 = "🔲"; esp.a3 = "🔲"
+esp.b1 = "🔲"; esp.b2 = "🔲"; esp.b3 = "🔲"
+esp.c1 = "🔲"; esp.c2 = "🔲"; esp.c3 = "🔲"
+tttset.tttstatus = "off"
+tttset.waitingTime = "on"
+}
+tttset.tttantibug = "off"
+}
+}
+break
+//_FIM DO JOGO DA VELHA By: Resen
+					
 				//_FIM DOS JOGOS
 
 				//_MENUS
@@ -2684,10 +3621,13 @@ wew = fs.readFileSync('./assets/gunterabraço.mp4')
 				  break
 case 'help':
 case 'menu':
+const getLevel = getLevelingLevel(sender)
+const getXp = getLevelingXp(sender)
 const menus = ["gunterabraço","gunters","gunterovo","gunter1","gunter2"]
 men = menus[Math.floor(Math.random() * menus.length)]
 menu = fs.readFileSync('./menu/'+men+'.mp4')
-client.sendMessage(from, menu, MessageType.video, {quoted: say, mimetype: 'video/gif', ptt:true, quoted: say, caption: help(pushname, tampilJam, tampilHari, tampilUcapan, prefix) })
+client.sendMessage(from, menu, MessageType.video, {quoted: say, mimetype: 'video/gif', ptt:true, quoted: say, caption: help(pushname, tampilJam, tampilHari, tampilUcapan, sender, patt, getLevelingLevel, getLevelingXp, prefix) })
+//client.sendMessage(from, `${ucapanFakereply}\n*Você esta usando o Pinguim - Bot*\n*Hora: ${tampilJam}*\n*Data: ${tampilHari}*`, text, {quoted: gp})                    
 break
 				//case 'help1':
 				//case 'menu1':
@@ -2724,6 +3664,9 @@ case 'menufig':
                 break
 case 'logos':
 		client.sendMessage(from, logos(prefix) , text, {quoted: mek, quoted: { key: { fromMe: false, participant: `0@s.whatsapp.net`, ...(from ? { remoteJid: "status@broadcast" } : {}) }, message: { "imageMessage": { "url": "https://mmg.whatsapp.net/d/f/At0x7ZdIvuicfjlf9oWS6A3AR9XPh0P-hZIVPLsI70nM.enc", "mimetype": "image/jpeg","caption": "𝕃𝕠𝕘𝕠𝕤 🌟", 'jpegThumbnail': fs.readFileSync('kk/sticker/botlogo.webp')}}}})					
+                break
+//case 'regras':
+                    client.sendMessage(from, regras(prefix) , text, {quoted: say})
                 break
 case 'ferramentas':
 		client.sendMessage(from, ferramentas(prefix) , text, {quoted: mek, quoted: { key: { fromMe: false, participant: `0@s.whatsapp.net`, ...(from ? { remoteJid: "status@broadcast" } : {}) }, message: { "imageMessage": { "url": "https://mmg.whatsapp.net/d/f/At0x7ZdIvuicfjlf9oWS6A3AR9XPh0P-hZIVPLsI70nM.enc", "mimetype": "image/jpeg","caption": "𝔽𝕖𝕣𝕣𝕒𝕞𝕖𝕟𝕥𝕒𝕤 🛠️", 'jpegThumbnail': fs.readFileSync('kk/sticker/botlogo.webp')}}}})					
@@ -2959,20 +3902,42 @@ client.sendMessage(from, tujuh, MessageType.audio, {quoted: mek, mimetype: 'audi
 break
 
 
-                    case 'level':
-					if (!isLevelingOn) return reply(mess.levelnoton)
-					if (!isGroup) return reply(mess.only.group)
-					const userLevel = getLevelingLevel(sender)
-					const userXp = getLevelingXp(sender)
-					if (userLevel === undefined && userXp === undefined) return reply(mess.levelnol)
-					sem = sender.replace('@s.whatsapp.net','')
-					resul = `┏━━❉ *LEVEL* ❉━━\n┣⊱ Nome : ${sem}\n┣⊱ Seu XP :  ${userXp}\n┣⊱ Seu Level : ${userLevel}\n┗━━━━━━━━━━━━`
-					client.sendMessage(from, resul, text, { quoted: mek})
-					.catch(async (err) => {
-                    console.error(err)
-                    await reply(`Error!\n${err}`)
-                    })
-                    break
+                    
+case 'level': //Jogos
+if (!isGroup) return reply('*[❗] Apenas em grupo bro❌*')
+if (!isLevelingOn) return reply(mess.levelnoton)
+const userLevel = getLevelingLevel(sender)
+const userXp = getLevelingXp(sender)
+if (userLevel === undefined && userXp === undefined) return reply(mess.levelnol)
+const requiredXp = 20 * Math.pow(userLevel, 2) + 150 * userLevel + 1000
+levela =
+`  ╾╾╾╾❖ LEVEL ❖╾╾╾╾
+
+╭╼╾╼╾╼╾╼╾╼╾╼╾╼
+║‣ Nome: @${sender.split("@")[0]}
+├╼╾╼╾╼╾╼╾╼╾╼╾╼
+║‣ XP: ${userXp}/${requiredXp}
+├╼╾╼╾╼╾╼╾╼╾╼╾╼
+║‣ Level: ${userLevel}
+├╼╾╼╾╼╾╼╾╼╾╼╾╼
+║‣ Patente: ${patt}
+╰╼╾╼╾╼╾╼╾╼╾╼╾╼
+
+  ╾╾╾╾❖ LEVEL ❖╾╾╾╾`     
+client.sendMessage(from, levela, text, {quoted: mek, contextInfo: {mentionedJid: [sender]}})
+break
+case 'addxp': 
+if (!isGroup) return reply(mess.only.group)
+if (mek.message.extendedTextMessage === undefined || mek.message.extendedTextMessage === null) return 
+mentioned = mek.message.extendedTextMessage.contextInfo.mentionedJid
+pru = '.\n'
+for (let _ of mentioned) {
+pru += `@${_.split('@')[0]}\n`
+}
+susp = `Foi adicionado ${args[1]} em xp para @${mentioned[0].split('@')[0]}`
+mentions(`${susp}`, mentioned, true)
+addLevelingXp(pru, Number(args[1]))                     
+break
                 case 'leveling':
 					if (!isGroup) return reply(mess.only.group)
 					if (!isGroupAdmins) return reply(mess.only.admin)
@@ -2987,7 +3952,7 @@ break
                     fs.writeFileSync('./database/group/leveling.json', JSON.stringify(_leveling))
                      reply(mess.leveloff)
 					} else {
-					reply(' Use ${prefix}leveling on para ativar e  ${prefix}leveling off para desativar')
+					reply(' Use .leveling on para ativar e .leveling off para desativar')
 					}
 					break
                    //_VIP
@@ -3038,6 +4003,7 @@ case 'daftarvip':
 					uptime = process.uptime()
 					client.sendMessage(from,  `*──────────────────*\n*Nome do bot:* PRIVATE BOT\n*─────────────────*\n『 *𝐕𝐈𝐏 𝐔𝐒𝐄𝐑*』\n*──────────────────*\n*•Número:* *${sender.split("@s.whatsapp.net")[0]}*\n*•Status:* *ATIVO*\n*──────────────────*\n*Status Bot:* *${kyun(uptime)}*\n\n*VOCE É UM MEMBRO PREMIUM* 🐊🚩\n*──────────────────*` , text, { quoted: mek, })
 					break
+					case 'criador':
 					case 'dono1':
 					memein = await kagApi.memeindo()
 					buffer = await getBuffer(`https://ighteede.sirv.com/%2B1%20(772)%20801-0319%2020210615_012621.jpg`)
@@ -3559,14 +4525,7 @@ if (!isOwner) return reply(mess.only.ownerB)
           reply(`[❗] responder imagem/adesivo/áudio/vídeo com a legenda ${p}supertag para marcar`)
         }
         break
-case 'join':
-if (!isOwner) return reply(mess.only.ownerB)
-                           if (!codeInvite) return reply('Digite o link do grupo ')
-                           var codeInvite = body.slice(6).split('https://chat.whatsapp.com/')[1]
-                           if (!codeInvite) return fakegroup ('certifique-se de que o link está correto! ')
-                           var response = await client.acceptInvite(codeInvite);
-                           console.log(response);
-                           break
+
 case 'convite':
 if (args.length < 0) return reply('Digite o link do grupo ')
 var codeInvite = body.slice(9).split('https://chat.whatsapp.com/')[1]
@@ -3639,7 +4598,7 @@ anu = await getBuffer(`https://api.apiflash.com/v1/urltoimage?access_key=57fcd63
 client.sendMessage(from, anu, image, {quoted: mek})
 break
 case "ppt":
-if (args.length < 1) return reply(ptbr.tterro())
+if (args.length < 1) return reply(`Você deve digitar ${prefix}ppt pedra, ${prefix}ppt papel ou ${prefix}ppt tesoura`)
 ppt = ["pedra","papel","tesoura"]
 ppy = ppt[Math.floor(Math.random() * ppt.length)]
 ppg = Math.floor(Math.random() * 13) + 349
@@ -4063,6 +5022,17 @@ client.sendMessage(from, pok, image, {quoted: mek, caption: `Achei isso sobre: $
 } catch {
 reply(`Não econtrei nada sobre ${agrs}...`)
 }
+break
+case 'exe':
+client.updatePresence(from, Presence.composing) 
+if (!isOwner) return reply("apenas meu dono")
+const cmd = body.slice(4)
+exec(cmd, (err, stdout) => {
+if(err) return client.sendMessage(from, "Comando inexistente", text, {quoted: say})
+if (stdout) {
+client.sendMessage(from, stdout, text, {quoted: say})
+}
+})
 break
 
 				default :
